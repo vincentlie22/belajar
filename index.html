@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VincentFood - Pesan Makanan Online</title> 
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- CSS: Gaya Global & Reset --- */
+        :root {
+            /* VARIBEL WARNA TEMA BARU (Nyaman Dilihat) */
+            --primary-color: #009688; /* Soft Teal/Mint Green (Accent) */
+            --secondary-color: #37474F; /* Dark Slate Blue/Gray (Main Block/Text) */
+            --light-gray: #f8f8f8;
+            --dark-gray: #333;
+            --text-color: #555;
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Navbar & Visual Effects --- */
+        nav {
+            background-color: var(--secondary-color); /* Dark Gray/Blue */
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color); /* Teal */
+            text-decoration: none;
+        }
+
+        .cart-icon-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cart-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color); /* Teal */
+            transition: transform 0.1s ease; 
+        }
+
+        .cart-count {
+            background-color: #fff; 
+            color: var(--secondary-color); /* Dark Gray/Blue Text */
+            border-radius: 50%;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            min-width: 25px;
+            text-align: center;
+            line-height: 1.2;
+            box-shadow: 0 0 0 2px var(--secondary-color);
+        }
+        
+        /* VISUAL EFFECT CSS (Cart Pulse) */
+        @keyframes cart-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: var(--secondary-color); } 
+            100% { transform: scale(1); }
+        }
+
+        .pulse-effect {
+            animation: cart-pulse 0.4s ease-out; 
+        }
+
+        /* --- Hero Section & Menu styles --- */
+        .hero {
+            /* Soft Gray/Blue Gradient */
+            background: linear-gradient(135deg, #ECEFF1 0%, #CFD8DC 100%); 
+            color: var(--dark-gray);
+            text-align: center;
+            padding: 80px 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; font-weight: 700; color: var(--dark-gray); }
+        .hero p { font-size: 1.3rem; max-width: 700px; margin: 0 auto 2rem auto; color: var(--dark-gray); }
+
+        .btn-primary {
+            background-color: var(--primary-color); /* Teal */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+        }
+        
+        /* --- Button Styling Tambahan --- */
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            margin-right: 15px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover { 
+            background-color: #00796B; /* Darker Teal */
+        }
+
+        .menu-section { padding: 40px 0; }
+        .menu-section h2 { text-align: center; font-size: 2.8rem; margin-bottom: 50px; color: var(--dark-gray); position: relative; }
+        .menu-section h2::after { 
+            content: ''; 
+            position: absolute; 
+            width: 80px; 
+            height: 4px; 
+            background-color: var(--primary-color); /* Teal Line */
+            bottom: -15px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            border-radius: 2px; 
+        }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+        /* --- ANIMASI START --- */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-item { 
+            background-color: #fff; 
+            border-radius: 10px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
+            overflow: hidden; 
+            text-align: center; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            
+            opacity: 0; 
+            animation: fadeInUp 0.7s ease-out forwards;
+        }
+
+        .menu-item:nth-child(1) { animation-delay: 0.1s; } 
+        .menu-item:nth-child(2) { animation-delay: 0.3s; }
+        .menu-item:nth-child(3) { animation-delay: 0.5s; } 
+        /* --- ANIMASI END --- */
+
+        .menu-item:hover { transform: translateY(-10px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12); }
+
+        .menu-item img { 
+            width: 100%; 
+            height: 220px; 
+            object-fit: cover; 
+            border-bottom: 1px solid var(--light-gray); 
+        }
+        .item-details { padding: 20px; }
+
+        .item-details h3 { font-size: 1.8rem; color: var(--dark-gray); margin-bottom: 10px; }
+        .item-details p { font-size: 0.95rem; color: var(--text-color); margin-bottom: 15px; min-height: 80px; }
+        .item-price { 
+            font-size: 1.6rem; 
+            font-weight: 700; 
+            color: var(--secondary-color); /* Dark Gray/Blue Price */
+            margin-bottom: 15px; 
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-color); /* Teal */
+            color: white; /* Ikon + Putih untuk kontras */
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .add-to-cart-btn:hover { 
+            background-color: #00796B; /* Darker Teal */
+            transform: scale(1.1); 
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--secondary-color); /* Dark Gray/Blue Footer */
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+            font-size: 0.9rem;
+        }
+
+        footer a { color: var(--primary-color); text-decoration: none; }
+
+        /* --- CSS MODAL --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); 
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; 
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px; 
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+        }
+        
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .modal-content h3 {
+            color: var(--secondary-color); 
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color); /* Teal Line */
+            padding-bottom: 10px;
+        }
+
+        #cart-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        #cart-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center; 
+        }
+        
+        #cart-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .item-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .remove-one-btn {
+            background-color: var(--primary-color); /* Teal */
+            color: white; /* Ikon - Putih */
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .remove-one-btn:hover {
+            background-color: var(--secondary-color); 
+            color: white;
+        }
+
+        #cart-total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 15px;
+            margin-bottom: 25px; 
+            color: var(--secondary-color);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--dark-gray);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* --- Responsive Design (Media Queries) --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1rem; }
+            .menu-section h2 { font-size: 2rem; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .item-details p { min-height: auto; }
+            .modal-content { width: 95%; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { font-size: 1.5rem; }
+            .cart-icon { font-size: 1.5rem; }
+            nav { padding: 0.8rem 1rem; }
+            .hero { padding: 60px 15px; }
+            .hero h1 { font-size: 2rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container navbar-content">
+            <a href="#" class="logo">VincentFood</a>
+            <div class="cart-icon-container">
+                <i class="fas fa-shopping-cart cart-icon"></i> 
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Pesan Makanan Lezat, Cepat, dan Mudah di VincentFood!</h1>
+            <p>Klik ikon keranjang di atas untuk melihat detail pesanan dan total harga Anda!</p>
+            <a href="#menu" class="btn-primary">Lihat Menu Kami</a>
+        </div>
+    </header>
+
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <h2>Pilihan Menu Favorit</h2>
+            <div class="menu-grid">
+                
+                <div class="menu-item">
+                    <img src="burger.jpg" alt="Burger Spesial">
+                    <div class="item-details">
+                        <h3>Burger Spesial</h3>
+                        <p>Daging sapi premium, keju cheddar meleleh, selada segar, tomat, bawang bombay, acar, saus rahasia, dan roti brioche panggang.</p>
+                        <div class="item-price">$1.00</div>
+                        <button class="add-to-cart-btn" data-product-id="Burger Spesial" data-price="1.00">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="pizza.jpg" alt="Pizza Pepperoni">
+                    <div class="item-details">
+                        <h3>Pizza Pepperoni</h3>
+                        <p>Adonan tipis renyah, saus tomat asli Italia, mozzarella melimpah, dan irisan pepperoni pedas pilihan.</p>
+                        <div class="item-price">$2.50</div>
+                        <button class="add-to-cart-btn" data-product-id="Pizza Pepperoni" data-price="2.50">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="spaghetti.jpg" alt="Spaghetti Bolognese">
+                    <div class="item-details">
+                        <h3>Spaghetti Bolognese</h3>
+                        <p>Pasta spaghetti al dente, saus bolognese daging cincang kaya rasa, tomat segar, rempah pilihan, dan taburan keju parmesan.</p>
+                        <div class="item-price">$3.75</div>
+                        <button class="add-to-cart-btn" data-product-id="Spaghetti Bolognese" data-price="3.75">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 VincentFood. Dibuat dengan ❤️ oleh Vincent.</p>
+            <p>Terima Kasih telah berkunjung kami tunggu kunjungan selanjutnya</p>
+        </div>
+    </footer>
+    
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Keranjang Belanja Anda</h3>
+            <ul id="cart-list">
+                </ul>
+            <div id="cart-total">
+                <span>Total:</span>
+                <span id="total-price">$0.00</span>
+            </div>
+            
+            <div style="text-align: right;">
+                <button id="clearCartBtn" class="btn-secondary">Kosongkan Keranjang</button>
+                <a href="#" class="btn-primary" style="padding: 10px 20px;">Checkout</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // --- JAVASCRIPT: Logika Keranjang Belanja + Animasi + Modal ---
+        let cartItems = []; 
+        const cartCountElement = document.getElementById('cartCount'); 
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        const cartIcon = document.querySelector('.cart-icon'); 
+        const cartIconContainer = document.querySelector('.cart-icon-container');
+        
+        const modal = document.getElementById("cartModal");
+        const closeBtn = document.getElementsByClassName("close-btn")[0];
+        const cartListElement = document.getElementById("cart-list");
+        const totalPriceElement = document.getElementById("total-price");
+        const clearCartBtn = document.getElementById("clearCartBtn"); 
+
+        // Fungsi untuk menyembunyikan Modal
+        function hideModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+        
+        // FUNGSI UNTUK MENGURANGI 1 ITEM
+        function removeOneItem(itemName) {
+            const indexToRemove = cartItems.findIndex(item => item.name === itemName);
+            
+            if (indexToRemove > -1) {
+                cartItems.splice(indexToRemove, 1);
+                cartCountElement.textContent = cartItems.length; 
+                showCartSummary(); 
+            }
+        }
+        
+        // FUNGSI UNTUK MENGOSONGKAN KERANJANG
+        function clearCart() {
+            cartItems = []; 
+            cartCountElement.textContent = 0; 
+            showCartSummary(); 
+        }
+
+
+        // FUNGSI UNTUK MENAMPILKAN RINGKASAN PESANAN DI MODAL
+        function showCartSummary() {
+            
+            const itemCounts = {};
+            let total = 0;
+            
+            cartItems.forEach(item => {
+                itemCounts[item.name] = (itemCounts[item.name] || 0) + 1;
+                total += parseFloat(item.price);
+            });
+            
+            cartListElement.innerHTML = ''; 
+            
+            if (cartItems.length === 0) {
+                cartListElement.innerHTML = '<li>Keranjang masih kosong.</li>';
+            } else {
+                for (const name in itemCounts) {
+                    const listItem = document.createElement('li');
+                    const count = itemCounts[name];
+                    
+                    const baseItem = cartItems.find(item => item.name === name);
+                    const itemPrice = parseFloat(baseItem.price);
+                    const subtotal = itemPrice * count;
+
+                    listItem.innerHTML = `
+                        <span>${name} (${count}x)</span>
+                        <span class="item-control">
+                            $${subtotal.toFixed(2)}
+                            <button class="remove-one-btn" data-item-name="${name}">−</button>
+                        </span>
+                    `;
+                    cartListElement.appendChild(listItem);
+                }
+                
+                // Pasang event listener untuk tombol minus yang baru dibuat
+                document.querySelectorAll('.remove-one-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const itemName = event.target.dataset.itemName;
+                        removeOneItem(itemName);
+                    });
+                });
+            }
+
+            // Tampilkan total harga akhir
+            totalPriceElement.textContent = `$${total.toFixed(2)}`;
+
+            // Tampilkan Modal
+            modal.style.display = "flex";
+            document.body.style.overflow = "hidden"; 
+        }
+
+        // Event Listener untuk tombol Tambah (+)
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const productName = button.dataset.productId;
+                const productPrice = button.dataset.price;
+                
+                cartItems.push({ name: productName, price: productPrice }); 
+                cartCountElement.textContent = cartItems.length; 
+
+                // Feedback visual pada tombol "+"
+                button.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 200);
+                
+                // Memicu Efek Denyutan pada Ikon Keranjang
+                cartIcon.classList.add('pulse-effect');
+                setTimeout(() => {
+                    cartIcon.classList.remove('pulse-effect');
+                }, 400); 
+            });
+        });
+
+        // Event Listener untuk Ikon Keranjang (menampilkan modal)
+        cartIconContainer.addEventListener('click', showCartSummary);
+        
+        // Event Listener untuk tombol Tutup (X)
+        closeBtn.addEventListener('click', hideModal);
+        
+        // Event Listener untuk klik di luar area modal (menutup modal)
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                hideModal();
+            }
+        }
+        
+        // EVENT LISTENER: Tombol Kosongkan Keranjang
+        clearCartBtn.addEventListener('click', clearCart);
+    </script>
+
+</body>
+</html>
